@@ -1,0 +1,65 @@
+1) Open HBASE:
+Command: hbase shell
+
+--Command: list (to list tables)
+
+--Command: describe 'flight' (To get structure of table)
+
+--Command: get 'flight','1' (For specific flight)
+
+--Command: disable 'tbl1'
+	   drop 'tbl1'
+	   
+2) Create table:
+Command: create 'flight','finfo','fsch'
+
+3) Put data:
+Command: put 'flight',1,'finfo:source','pune'
+	 put 'flight',1,'finfo:dest','mumbai'
+	 put 'flight',1,'fsch:at','10:25am'
+	 put 'flight',1,'fsch:dt','11:25am'
+	 put 'flight',1,'fsch:delay',100
+	 
+	 
+4) Link external table:
+
+CREATE external TABLE hive_flight(fno int, fsource string,fdest string,fsh_at string,fsh_dt string,fsch_delay string)
+STORED BY 'org.apache.hadoop.hive.hbase.HBaseStorageHandler'
+WITH SERDEPROPERTIES ("hbase.columns.mapping" =
+":key,finfo:source,finfo:dest,fsch:at,fsch:dt,fsch:delay")
+TBLPROPERTIES ("hbase.table.name" = "flight");
+
+
+5) Sum of delay SQL command:
+
+select sum(fsch_delay) from hive_flight;
+
+
+6) Average of delay SQL command:
+
+select avg(fsch_delay) from hive_flight;
+
+
+7) Create an index on the Hive Table:
+
+CREATE INDEX hive_flight_index
+ON TABLE hive_flight (fsch_delay)
+AS 'org.apache.hadoop.hive.ql.index.compact.CompactIndexHandler'
+WITH DEFERRED REBUILD;
+
+
+SHOW INDEX ON hive_flight;
+
+8) Create table in Hive:
+
+create external table empdata2 ( ename string, esal int)
+row format delimited fields terminated by "," stored as textfile;
+
+9) To load data:
+
+load data local inpath '/home/hduser/Desktop/empdb.txt' into table empdata2;
+
+10) Join tables:
+
+SELECT eno, ename, empno, empgrade FROM empdbnew JOIN empinfo ON eno = 
+empno;
